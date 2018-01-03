@@ -9,11 +9,11 @@
 
 set -x
 
-USER=ubuntu
-GROUP=ubuntu
+USER=ubuntu # 用户
+GROUP=ubuntu # 组
 FLANELADDR=https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
-KUBECONF=/home/ubuntu/kubeadm.conf
-REGMIRROR=YOUR_OWN_DOCKER_REGISTRY_MIRROR_URL
+KUBECONF=/home/ubuntu/kubeadm.conf # 文件地址, 改成你需要的路径
+REGMIRROR=YOUR_OWN_DOCKER_REGISTRY_MIRROR_URL # docker registry mirror 地址
 
 install_docker() {
   mkdir /etc/docker

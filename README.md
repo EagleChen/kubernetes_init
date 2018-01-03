@@ -8,7 +8,7 @@ install docker, kubernetes and initialize kubernetes cluster by kubeadm
 ```
 git clone git@github.com:EagleChen/kubernetes_init.git
 cd kubernetes_init
-# 修改 install.sh
+# 修改 install.sh, 一定要(至少)改前面几个变量， 否则并不会执行成功
 sudo ./install.sh pre
 sudo ./install.sh kubernetes
 ```
