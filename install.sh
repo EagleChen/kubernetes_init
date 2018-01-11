@@ -15,6 +15,13 @@ FLANELADDR=https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation
 KUBECONF=/home/ubuntu/kubeadm.conf # 文件地址, 改成你需要的路径
 REGMIRROR=YOUR_OWN_DOCKER_REGISTRY_MIRROR_URL # docker registry mirror 地址
 
+# you can get the following values from `kubeadm init` output
+# these are needed when creating node
+MASTERTOKEN=YOUR_TOKEN
+MASTERIP=MASTER_IP
+MASTERPORT=MASTER_PORT
+MASTERHASH=MASTER_HASH
+
 install_docker() {
   mkdir /etc/docker
   mkdir -p /data/docker
@@ -60,9 +67,7 @@ enable_kubectl() {
 
 # for now, better to download from original registry
 apply_flannel() {
-  curl -o /tmp/kube-flannel.yml $FLANELADDR
-  sed -i "s,quay\.io/coreos,registry.cn-hangzhou.aliyuncs.com/google-containers,g" /tmp/flannel.yaml # use google-containers, but there is no 9.1 version yet
-  kubectl apply -f /tmp/flannel
+  kubectl apply -f $FLANELADDR
 }
 
 case "$1" in
@@ -71,10 +76,15 @@ case "$1" in
     add_user_to_docker_group
     install_kube_commands
     ;;
-  "kubernetes")
+  "kubernetes-master")
     sysctl net.bridge.bridge-nf-call-iptables=1
     restart_kubelet
     kubeadm init --config $KUBECONF
+    ;;
+  "kubernetes-node")
+    sysctl net.bridge.bridge-nf-call-iptables=1
+    restart_kubelet
+    kubeadm join --token $MASTERTOKEN $MASTERIP:$MASTERPORT --discovery-token-ca-cert-hash sha256:$MASTERHASH
     ;;
   "post")
     if [[ $EUID -ne 0 ]]; then
@@ -82,7 +92,7 @@ case "$1" in
       exit
     fi
     enable_kubectl
-    # apply_flannel
+    apply_flannel
     ;;
   *)
     echo "huh ????"
